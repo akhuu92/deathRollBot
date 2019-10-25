@@ -1,8 +1,6 @@
 require('dotenv').config()
-
 const Telegraf = require('telegraf')
 const utils = require('./src/utils.js')
-
 const BOT_TOKEN = process.env.BOT_TOKEN
 
 if (!BOT_TOKEN) {
@@ -10,7 +8,6 @@ if (!BOT_TOKEN) {
 }
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
-
 const games = {}
 
 bot.command(['dr', 'deathroll'], (ctx) => {
@@ -22,12 +19,7 @@ bot.command(['dr', 'deathroll'], (ctx) => {
   }
 
   utils.startGame(ctx, games, params, chatId, player)
-
-  if (games[chatId].isPlaying) {
-    utils.throwDice(ctx, games, chatId, player)
-  } else {
-    ctx.replyWithHTML(`Use <code>/dr new [num]</code> for new ☠🎲`)
-  }
+  utils.throwDice(ctx, games, chatId, player)
 })
 
 bot.command('help', (ctx) => {

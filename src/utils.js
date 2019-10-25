@@ -4,6 +4,11 @@ const MIN = 1
 const MAX = 9999
 
 async function throwDice (ctx, games, chatId, player) {
+  if (!games[chatId].isPlaying) {
+    await ctx.replyWithHTML(`Use <code>/dr new [num]</code> for new ☠🎲`)
+    return
+  }
+
   if (!_.isUndefined(games[chatId].lastPlayer) && player.playerId === games[chatId].lastPlayer.playerId) {
     await ctx.replyWithHTML(`<b>${player.displayName}</b> already rolled, waiting for other players`)
     return
@@ -63,7 +68,12 @@ async function startGame (ctx, games, params, chatId, player) {
 
 async function helpMenu (ctx, params) {
   if (params.length === 1 && _.toLower(params[0] === '@rolobot')) {
-    ctx.replyWithHTML('How to use this bot:\n- Type <code>/dr new [num]</code> to start a new game.')
+    ctx.replyWithHTML(
+      `How to use this bot:
+- Type <code>/dr new [num]</code> to start a new game.
+- Defaults to (${MIN} - ${MAX})
+`
+    )
   }
 }
 
