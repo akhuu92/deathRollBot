@@ -25,7 +25,7 @@ bot.command('roll', (ctx) => {
     if (params[1] === "new") {
       if (params[2]) {
         var newValue = Number.parseInt(params[2])
-        if (Number.isNaN(newValue) || isFinite(newValue) || newValue > Number.MAX_VALUE || newValue < 0) {
+        if (Number.isNaN(newValue) || newValue > Number.MAX_VALUE || newValue < 0) {
           ctx.reply(`Please roll a valid positive number, defaulting to ${MAX}.`)
           newValue = MAX;
         }
@@ -36,7 +36,7 @@ bot.command('roll', (ctx) => {
       }
 
       state.playing = true;
-      ctx.reply(`${ctx.from.username} started a new Death Roll`);
+      ctx.reply(`${ctx.from.username} started a new Death Roll.`);
     }
   }
 
@@ -55,6 +55,10 @@ bot.command('roll', (ctx) => {
       ctx.reply(`${ctx.from.username} rolled: ${currentRoll}`);
     }
   }
+})
+
+bot.command('help', (ctx) => {
+  ctx.reply("How to use this bot:\n- Type /roll new [num] to start a new game.\n- Type /roll after a game has been started to roll.");
 })
 
 bot.launch()
