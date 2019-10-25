@@ -11,7 +11,7 @@ if (!BOT_TOKEN) {
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
-let games = {}
+const games = {}
 
 bot.command(['dr', 'deathroll'], (ctx) => {
   const params = utils.parseParams(ctx.message.text)

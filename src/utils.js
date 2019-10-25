@@ -4,9 +4,7 @@ const MIN = 1
 const MAX = 9999
 
 async function throwDice (ctx, games, chatId, player) {
-  if (_.isUndefined(games[chatId].lastPlayer)) {
-    games[chatId].lastPlayer = player
-  } else if (player.playerId === games[chatId].lastPlayer.playerId) {
+  if (!_.isUndefined(games[chatId].lastPlayer) && player.playerId === games[chatId].lastPlayer.playerId) {
     await ctx.replyWithHTML(`<b>${player.displayName}</b> already rolled, waiting for other players`)
     return
   }
@@ -52,22 +50,18 @@ async function startGame (ctx, games, params, chatId, player) {
   }
 
   if (newGame) {
-    if (!games[chatId].isPlaying) {
-      games[chatId] = {
-        chatId: chatId,
-        isPlaying: true,
-        rolls: 0,
-        maxRoll: newMaxRoll
-      }
-
-      await ctx.replyWithHTML(`<b>${player.displayName}</b> starting new ☠🎲 <i>(${MIN} - ${games[chatId].maxRoll})</i>`)
-    } else {
-      await ctx.replyWithHTML(`☠🎲 <i>in progress</i>`)
+    games[chatId] = {
+      chatId: chatId,
+      isPlaying: true,
+      rolls: 0,
+      maxRoll: newMaxRoll
     }
+
+    await ctx.replyWithHTML(`<b>${player.displayName}</b> starting new ☠🎲 <i>(${MIN} - ${games[chatId].maxRoll})</i>`)
   }
 }
 
-async function helpMenu(ctx, params) {
+async function helpMenu (ctx, params) {
   if (params.length === 1 && _.toLower(params[0] === '@rolobot')) {
     ctx.replyWithHTML('How to use this bot:\n- Type <code>/dr new [num]</code> to start a new game.')
   }
