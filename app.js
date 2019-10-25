@@ -30,4 +30,8 @@ bot.command(['dr', 'deathroll'], (ctx) => {
   }
 })
 
+bot.command('help', (ctx) => {
+  ctx.reply("How to use this bot:\n- Type /dr new [num] to start a new game.\n- Type /roll after a game has been started to roll.");
+})
+
 bot.launch()
