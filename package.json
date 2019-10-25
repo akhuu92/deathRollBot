@@ -1,0 +1,26 @@
+{
+  "name": "deathrollbot",
+  "version": "1.0.0",
+  "description": "Telegram Deathroll Bot",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akhuu92/deathRollBot.git"
+  },
+  "author": "Alvin Khuu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/akhuu92/deathRollBot/issues"
+  },
+  "homepage": "https://github.com/akhuu92/deathRollBot#readme",
+  "devDependencies": {
+    "dotenv": "^8.2.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15",
+    "telegraf": "^3.33.0"
+  }
+}
