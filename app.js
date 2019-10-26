@@ -1,16 +1,16 @@
 require('dotenv').config()
-const Telegraf = require('telegraf')
-const utils = require('./src/utils.js')
-
 const BOT_TOKEN = process.env.BOT_TOKEN
 const BOT_NAME = process.env.BOT_NAME
 
+const Telegraf = require('telegraf')
+const utils = require('./src/utils.js')
+
 if (!BOT_TOKEN) {
-  throw new Error('Missing Bot API Key: (BOT_TOKEN). Please set it in ENV.')
+  throw new Error('Missing Bot API Key in ENV: (BOT_TOKEN)')
 }
 
 if (!BOT_NAME) {
-  throw new Error('Missing Bot Name: (BOT_TOKEN). Please set it in ENV.')
+  throw new Error('Missing Bot Name in ENV: (BOT_NAME)')
 }
 
 const bot = new Telegraf(BOT_TOKEN)
@@ -27,11 +27,9 @@ bot.command(['dr', 'deathroll'], (ctx) => {
 
   utils.startGame(ctx, games, params, chatId, player)
   utils.throwDice(ctx, games, chatId, player)
-  utils.deleteMessage(ctx)
+  utils.deleteMessage(ctx, games, chatId, player, BOT_NAME)
 })
 
-bot.command('help', (ctx) => {
-  utils.helpMenu(BOT_NAME, ctx, utils.parseParams(ctx.message.text))
-})
+bot.command('help', (ctx) => utils.helpMenu(ctx, utils.parseParams(ctx.message.text), BOT_NAME))
 
 bot.launch()
