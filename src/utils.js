@@ -82,10 +82,10 @@ async function deleteMessage (ctx) {
   await ctx.deleteMessage()
 }
 
-async function helpMenu (ctx, params) {
-  if (params.length === 1 && _.toLower(params[0] === '@rolobot')) {
+async function helpMenu (botName, ctx, params) {
+  if (params.length === 1 && _.toLower(params[0]) === _.toLower(`@${botName}`)) {
     ctx.replyWithHTML(
-      `How to use this bot:
+      `How to use ${botName}:
 - Type <code>/dr new [num]</code> to start a new game.
 - Defaults to (${MIN} - ${MAX})
 - Allow user to roll consecutively <code>/dr new [num] [c]</code>

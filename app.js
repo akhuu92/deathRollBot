@@ -3,9 +3,14 @@ const Telegraf = require('telegraf')
 const utils = require('./src/utils.js')
 
 const BOT_TOKEN = process.env.BOT_TOKEN
+const BOT_NAME = process.env.BOT_NAME
 
 if (!BOT_TOKEN) {
-  throw new Error('Missing Bot API Key: (BOT_TOKEN). Please set it in ENV')
+  throw new Error('Missing Bot API Key: (BOT_TOKEN). Please set it in ENV.')
+}
+
+if (!BOT_NAME) {
+  throw new Error('Missing Bot Name: (BOT_TOKEN). Please set it in ENV.')
 }
 
 const bot = new Telegraf(BOT_TOKEN)
@@ -26,7 +31,7 @@ bot.command(['dr', 'deathroll'], (ctx) => {
 })
 
 bot.command('help', (ctx) => {
-  utils.helpMenu(ctx, utils.parseParams(ctx.message.text))
+  utils.helpMenu(BOT_NAME, ctx, utils.parseParams(ctx.message.text))
 })
 
 bot.launch()
