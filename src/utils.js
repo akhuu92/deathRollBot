@@ -3,8 +3,8 @@ var _ = require('lodash')
 const MIN = 1
 const MAX = 9999
 
-async function throwDice (ctx, games, chatId, player) {
-  if (!games[chatId].isPlaying) {
+async function throwDice (ctx, games, source) {
+  if (!games[source.chatId].isPlaying) {
     try {
       await ctx.replyWithHTML(`Use <code>/dr new [num]</code> for new ☠🎲`)
     } catch (error) {
@@ -14,11 +14,11 @@ async function throwDice (ctx, games, chatId, player) {
     return
   }
 
-  if (!_.isUndefined(games[chatId].lastPlayer) &&
-    player.playerId === games[chatId].lastPlayer.playerId &&
-    !games[chatId].consecutiveRoll) {
+  if (!_.isUndefined(games[source.chatId].lastPlayer) &&
+  source.player.playerId === games[source.chatId].lastPlayer.playerId &&
+    !games[source.chatId].consecutiveRoll) {
     try {
-      await ctx.replyWithHTML(`<b>${player.displayName}</b> already rolled, waiting for other players`)
+      await ctx.replyWithHTML(`<b>${source.player.displayName}</b> already rolled, waiting for other players`)
     } catch (error) {
       console.error(`Failed to send "Waiting For Players" message: ${error.toString()}`)
     }
@@ -26,45 +26,45 @@ async function throwDice (ctx, games, chatId, player) {
     return
   }
 
-  games[chatId].lastPlayer = player
-  games[chatId].rolls++
+  games[source.chatId].lastPlayer = source.player
+  games[source.chatId].rolls++
 
-  const roll = _.random(MIN, games[chatId].maxRoll)
+  const roll = _.random(MIN, games[source.chatId].maxRoll)
 
   try {
-    await ctx.replyWithHTML(`<b>${player.displayName}</b> rolls <b>${roll}</b>  <i>(${MIN} - ${games[chatId].maxRoll})</i>`)
+    await ctx.replyWithHTML(`<b>${source.player.displayName}</b> rolls <b>${roll}</b>  <i>(${MIN} - ${games[source.chatId].maxRoll})</i>`)
   } catch (error) {
     console.error(`Failed to send "Last Roll" message: ${error.toString()}`)
   }
 
   if (roll === 1) {
-    games[chatId].isPlaying = false
+    games[source.chatId].isPlaying = false
     try {
-      await ctx.replyWithHTML(`<b>${player.displayName}</b> ☠☠☠ in ${games[chatId].rolls} rolls!`)
+      await ctx.replyWithHTML(`<b>${source.player.displayName}</b> ☠☠☠ in ${games[source.chatId].rolls} rolls!`)
     } catch (error) {
       console.error(`Failed to send "Loser" message: ${error.toString()}`)
     }
   } else {
-    games[chatId].maxRoll = roll
+    games[source.chatId].maxRoll = roll
   }
 }
 
-async function startGame (ctx, games, params, chatId, player) {
+async function startGame (ctx, games, source) {
   let newMaxRoll = MAX
   let newGame = false
   let consecutiveRoll = false
 
-  if (params.length >= 1) {
-    if (_.toLower(params[0]) === 'new') {
+  if (source.params.length >= 1) {
+    if (_.toLower(source.params[0]) === 'new') {
       newGame = true
 
-      if (params.length >= 2) {
-        if (_.toLower(params[1]) === 'c') {
+      if (source.params.length >= 2) {
+        if (_.toLower(source.params[1]) === 'c') {
           consecutiveRoll = true
         } else {
-          newMaxRoll = _.clamp(_.toInteger(params[1]), MIN, MAX)
+          newMaxRoll = _.clamp(_.toInteger(source.params[1]), MIN, MAX)
 
-          if (!_.isUndefined(params[2]) && _.toLower(params[2]) === 'c') {
+          if (!_.isUndefined(source.params[2]) && _.toLower(source.params[2]) === 'c') {
             consecutiveRoll = true
           }
         }
@@ -72,9 +72,9 @@ async function startGame (ctx, games, params, chatId, player) {
     }
   }
 
-  if (_.isUndefined(games[chatId])) {
-    games[chatId] = {
-      chatId: chatId,
+  if (_.isUndefined(games[source.chatId])) {
+    games[source.chatId] = {
+      chatId: source.chatId,
       isPlaying: false,
       rolls: 0,
       maxRoll: MAX,
@@ -84,32 +84,32 @@ async function startGame (ctx, games, params, chatId, player) {
   }
 
   if (newGame) {
-    games[chatId].chatId = chatId
-    games[chatId].isPlaying = true
-    games[chatId].rolls = 0
-    games[chatId].maxRoll = newMaxRoll
-    games[chatId].consecutiveRoll = consecutiveRoll
+    games[source.chatId].chatId = source.chatId
+    games[source.chatId].isPlaying = true
+    games[source.chatId].rolls = 0
+    games[source.chatId].maxRoll = newMaxRoll
+    games[source.chatId].consecutiveRoll = consecutiveRoll
 
     try {
-      await ctx.replyWithHTML(`<b>${player.displayName}</b> starting new ☠🎲 <i>(${MIN} - ${games[chatId].maxRoll})</i>`)
+      await ctx.replyWithHTML(`<b>${source.player.displayName}</b> starting new ☠🎲 <i>(${MIN} - ${games[source.chatId].maxRoll})</i>`)
     } catch (error) {
       console.error(`Failed to send "New Game" message: ${error.toString()}`)
     }
   }
 }
 
-async function deleteMessage (ctx, games, chatId, player, botName) {
+async function deleteMessage (ctx, games, source, botName) {
   let messageDeleted = false
 
   try {
     await ctx.deleteMessage()
     messageDeleted = true
   } catch (error) {
-    console.error(`Failed to delete ${player.displayName}'s roll in chat ${chatId}: ${error.toString()}`)
+    console.error(`Failed to delete ${source.player.displayName}'s roll in chat ${source.chatId}: ${error.toString()}`)
   }
 
   if (!messageDeleted) {
-    if (!games[chatId].hasSeenDeleteMessage) {
+    if (!games[source.chatId].hasSeenDeleteMessage) {
       try {
         await await ctx.replyWithHTML(
           `<i>To remove rolls from chat, give</i>
@@ -120,13 +120,13 @@ async function deleteMessage (ctx, games, chatId, player, botName) {
         console.error(`Failed to send "Tooltip to Remove Rolls" message: ${error.toString()}`)
       }
 
-      games[chatId].hasSeenDeleteMessage = true
+      games[source.chatId].hasSeenDeleteMessage = true
     }
   }
 }
 
-async function helpMenu (ctx, params, botName) {
-  if (params.length === 1 && _.toLower(params[0]) === _.toLower(`@${botName}`)) {
+async function helpMenu (ctx, source, botName) {
+  if (source.params.length === 1 && _.toLower(source.params[0]) === _.toLower(`@${botName}`)) {
     ctx.replyWithHTML(
       `How to use ${botName}:
 - Type <code>/dr new [num]</code> to start a new game.
@@ -134,6 +134,17 @@ async function helpMenu (ctx, params, botName) {
 - Allow user to roll consecutively <code>/dr new [num] [c]</code>
 `
     )
+  }
+}
+
+function parseMessage(message) {
+  return {
+    params: parseParams(message.text),
+    chatId: message.chat.id,
+    player: {
+      playerId: message.from.id,
+      displayName: getDisplayName(message.from)
+    }
   }
 }
 
@@ -154,3 +165,4 @@ module.exports.parseParams = parseParams
 module.exports.getDisplayName = getDisplayName
 module.exports.helpMenu = helpMenu
 module.exports.deleteMessage = deleteMessage
+module.exports.parseMessage = parseMessage

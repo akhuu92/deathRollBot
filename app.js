@@ -18,16 +18,11 @@ const bot = new Telegraf(BOT_TOKEN)
 const games = {}
 
 bot.command(['dr', 'deathroll'], (ctx) => {
-  const params = utils.parseParams(ctx.message.text)
-  const chatId = ctx.message.chat.id
-  const player = {
-    playerId: ctx.message.from.id,
-    displayName: utils.getDisplayName(ctx.message.from)
-  }
+  const source = utils.parseMessage(ctx.message)
 
-  utils.startGame(ctx, games, params, chatId, player)
-  utils.throwDice(ctx, games, chatId, player)
-  utils.deleteMessage(ctx, games, chatId, player, BOT_NAME)
+  utils.startGame(ctx, games, source)
+  utils.throwDice(ctx, games, source)
+  utils.deleteMessage(ctx, games, source, BOT_NAME)
 })
 
 bot.command('help', (ctx) => utils.helpMenu(ctx, utils.parseParams(ctx.message.text), BOT_NAME))
