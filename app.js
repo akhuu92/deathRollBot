@@ -24,6 +24,10 @@ bot.command('help', (ctx) => {
   ctx.reply('How to use this bot:\n- Type /roll new [num] to start a new game.\n- Type /roll after a game has started to roll.')
 })
 
+bot.command('dat', (ctx) => {
+  ctx.reply("dEuH");
+})
+
 bot.launch()
 
 function getRandomIntInclusive (min, max) {
